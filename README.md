@@ -4,9 +4,10 @@ Given a Configuration Profile as an argument, this script:
 - builds a flat package that installs it to a configurable path
 - creates a postinstall script to install the profile
   - (optionally removing the .mobileconfig file after installation)
-- creates a pkginfo file for installation with Munki, complete with
-  an uninstall script
-- calls munkiimport to import the pkg into the repo
+- creates an uninstall script for Munki to allow the profile to be
+  later removed
+- calls munkiimport to create a new pkginfo and import the pkg into
+  the repo
 
 Run with `-h` to see the full help.
 
