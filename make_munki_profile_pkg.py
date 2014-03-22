@@ -24,6 +24,15 @@ default_repo_destination = "profiles"
 def main():
     usage = "%prog [options] path/to/mobileconfig/file"
     o = optparse.OptionParser(usage=usage)
+    o.add_option("-t", "--install-time", default="immediate",
+        help=("Either 'immediate' or 'nextboot'. If set to 'immediate', "
+              "profile will be installed at '--installed-path' and 'profiles' "
+              "will install it immediately. If set to "
+              "'nextboot', profile is installed to /private/var/db/"
+              "ConfigurationProfiles/Setup for automatic installation on "
+              "the next boot, the .profileSetupDone flag "
+              "file is removed and the package is marked as requiring "
+              "a restart. Defaults to 'immediate'."))
     o.add_option("-f", "--format-name", default=default_name_format_string,
         metavar="FORMAT-STRING",
         help=("A format string specifying the desired pkginfo item name, which "
@@ -67,6 +76,16 @@ def main():
             sys.exit("A required exeuctable, %s could not be found "
                      "or is not executable!" % executable)
 
+    if opts.install_time not in ["immediate", "nextboot"]:
+        sys.exit("--install-time must be either 'immediate' or 'nextboot'!")
+
+
+    if opts.install_time == "nextboot" and \
+        opts.installed_path != default_installed_path:
+        print >> sys.stderr, (
+            "WARNING: --installed-path option ignored when --install-time "
+            "is nextboot!")
+
     # Grab the profile's identifier for use later in the pkginfo's uninstall_script
     try:
         pdata = plistlib.readPlist(profile_path)
@@ -100,6 +119,8 @@ def main():
     pkg_output_path = os.path.join(tempfile.mkdtemp(), pkg_filename)
 
     # -- payload
+    if opts.install_time == "nextboot":
+        opts.installed_path = "/private/var/db/ConfigurationProfiles/Setup"
     root = tempfile.mkdtemp()
     pkg_payload_destination = os.path.join(root, opts.installed_path.lstrip("/"))
     profile_installed_path = os.path.join(
@@ -110,7 +131,16 @@ def main():
     # -- postinstall script
     script_root = tempfile.mkdtemp()
     script_path = os.path.join(script_root, "postinstall")
-    install_script = """#!/bin/sh
+
+    if opts.install_time == "nextboot":
+        install_script = """#!/bin/sh
+PROFILES_DONE="${3}/private/var/db/ConfigurationProfiles/Setup/.profileSetupDone"
+if [ -e "${PROFILES_DONE}" ]; then
+  rm "${PROFILES_DONE}"
+fi
+"""
+    else:
+        install_script = """#!/bin/sh
 
 /usr/bin/profiles -I -F %s
 """ % profile_installed_path
@@ -120,6 +150,15 @@ def main():
         fd.write(install_script)
     os.chmod(script_path, 0755)
 
+    # -- PackageInfo template
+    info_template_path = tempfile.mkstemp()[1]
+    info = "<pkg-info "
+    if opts.install_time == "nextboot":
+        info += "postinstall-action=\"restart\""
+    info += "></pkg-info>"
+    with open(info_template_path, "w") as fd:
+        fd.write(info)
+
     # -- build it
     subprocess.call([
         pkgbuild,
@@ -127,6 +166,7 @@ def main():
         "--identifier", pkg_identifier,
         "--version", version,
         "--scripts", script_root,
+        "--info", info_template_path,
         pkg_output_path])
 
     # Munki-related
