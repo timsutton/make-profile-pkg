@@ -11,10 +11,9 @@ Given a Configuration Profile as an argument, this script:
 
 Run with `-h` to see the full help.
 
-There are some additional options to tweak the pkg/Munki item name
-and package identifier, but currently no other options to configure
-the pkginfo keys you may wish to configure afterwards
-(minimum_os_version, requires, update_for, etc.).
+There are some additional options to tweak the pkg/Munki item name and package identifier, but currently no other options to configure the pkginfo keys you may wish to configure afterwards (minimum_os_version, requires, update_for, etc.).
+
+It also supports an alternate package layout, in the profile is instead placed in Apple's supported ["install on startup" location](http://www.318.com/2013/10/enroll-existing-10-8-machines-in-profile-manager-or-another-mdm-using-apple-remote-desktop). See the `--install-time` option for more details.
 
 
 ### Rationale
