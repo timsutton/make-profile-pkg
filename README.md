@@ -7,13 +7,13 @@ Given a Configuration Profile as an argument, this script:
 - creates an uninstall script for Munki to allow the profile to be
   later removed
 - calls munkiimport to create a new pkginfo and import the pkg into
-  the repo
+  the repo (if desired)
 
 Run with `-h` to see the full help.
 
 There are some additional options to tweak the pkg/Munki item name and package identifier, but currently no other options to configure the pkginfo keys you may wish to configure afterwards (minimum_os_version, requires, update_for, etc.).
 
-It also supports an alternate package layout, in the profile is instead placed in Apple's supported ["install on startup" location](http://www.318.com/2013/10/enroll-existing-10-8-machines-in-profile-manager-or-another-mdm-using-apple-remote-desktop). See the `--install-time` option for more details.
+If the package isn't installed to the boot volume (when using AutoDMG, for example), the profile will be copied to`` /private/var/db/ConfigurationProfiles/Setup`` so it will be installed at the next reboot.
 
 
 ### Rationale

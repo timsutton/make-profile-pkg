@@ -26,7 +26,8 @@ def main():
     o = optparse.OptionParser(usage=usage)
     o.add_option("--use-munki", default="munki",
         help=("Either 'munki' or 'standalone'. If set to 'standalone', "
-              "package will be saved in the same directory as the script. "))
+              "package will be saved in the same directory as the script "
+              "and no attempt will be made to import it into Munki. "))
     o.add_option("-f", "--format-name", default=default_name_format_string,
         metavar="FORMAT-STRING",
         help=("A format string specifying the desired pkginfo item name, which "
