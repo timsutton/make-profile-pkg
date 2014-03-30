@@ -132,14 +132,14 @@ def main():
     script_path = os.path.join(script_root, "postinstall")
 
     config_profile = profile_name + '.mobileconfig'
+    print config_profile
     install_script = """#!/bin/sh
 if [ "$3" == "/" ] ; then
     /usr/bin/profiles -I -F %s
 else
-    PROFILESDIR="$3/var/db/ConfigurationProfiles"
-    /bin/mkdir -p "$PROFILESDIR/Setup"
-    /bin/cp %s $PROFILESDIR/%s
-    /bin/rm -f /private/var/db/ConfigurationProfiles/Setup/.profileSetupDone
+    /bin/mkdir -p "$3/private/var/db/ConfigurationProfiles/Setup"
+    /bin/cp "$3%s" "$3/private/var/db/ConfigurationProfiles/Setup/%s"
+    /bin/rm -f $3/private/var/db/ConfigurationProfiles/Setup/.profileSetupDone
 fi
 """ % (profile_installed_path, profile_installed_path, config_profile)
     if opts.delete_after_install:
