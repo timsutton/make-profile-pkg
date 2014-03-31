@@ -6,8 +6,8 @@ Given a Configuration Profile as an argument, this script:
   - (optionally removing the .mobileconfig file after installation)
 - creates an uninstall script for Munki to allow the profile to be
   later removed
-- calls munkiimport to create a new pkginfo and import the pkg into
-  the repo (if desired)
+- optionally calls munkiimport to create a new pkginfo and import the pkg into
+  the repo (when passing the ``-m`` option)
 
 Run with `-h` to see the full help.
 
