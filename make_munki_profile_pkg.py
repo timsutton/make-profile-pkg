@@ -32,6 +32,11 @@ def main():
         help=("Destination directory in Munki repo. Defaults to '%s'. "
               % default_repo_destination))
     o.add_option_group(m_opts)
+
+    o.add_option("-o", "--output-dir", default=os.getcwd(),
+        help=("Output directory for built package and uninstall script. "
+              "Directory must already exist. Defaults to the current "
+              "working directory."))
     o.add_option("-f", "--format-name", default=default_name_format_string,
         metavar="FORMAT-STRING",
         help=("A format string specifying the desired pkginfo item name, which "
@@ -75,6 +80,11 @@ def main():
             sys.exit("A required exeuctable, '%s', could not be found "
                      "or is not executable!" % executable)
 
+    output_dir = opts.output_dir
+    if not os.path.isdir(output_dir) or not os.access(output_dir, os.W_OK):
+        sys.exit("Output directory '%s' either doesn't exist or is not writable!"
+            % output_dir)
+
     # Grab the profile's identifier for use later in the pkginfo's uninstall_script
     try:
         pdata = plistlib.readPlist(profile_path)
@@ -106,7 +116,7 @@ def main():
     pkg_filename = "%s-%s.pkg" % (item_name, version)
     pkg_identifier = "%s.%s" % (opts.pkg_prefix, item_name)
     
-    pkg_output_path = os.path.join(os.getcwd(), pkg_filename)
+    pkg_output_path = os.path.join(output_dir, pkg_filename)
     
     root = tempfile.mkdtemp()
     pkg_payload_destination = os.path.join(root, opts.installed_path.lstrip("/"))
