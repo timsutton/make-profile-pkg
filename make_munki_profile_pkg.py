@@ -116,12 +116,13 @@ def main():
 
     config_profile = profile_name + '.mobileconfig'
     install_script = """#!/bin/sh
-if [ "$3" == "/" ] ; then
+if [ "$3" = "/" ] ; then
     /usr/bin/profiles -I -F %s
 else
-    /bin/mkdir -p "$3/private/var/db/ConfigurationProfiles/Setup"
-    /bin/cp "$3%s" "$3/private/var/db/ConfigurationProfiles/Setup/%s"
-    /bin/rm -f $3/private/var/db/ConfigurationProfiles/Setup/.profileSetupDone
+    PROFILES_SETUP=private/var/db/ConfigurationProfiles/Setup
+    /bin/mkdir -p "$3/$PROFILES_SETUP"
+    /bin/cp "$3%s" "$3/$PROFILES_SETUP/%s"
+    /bin/rm -f "$3/$PROFILES_SETUP/.profileSetupDone"
 fi
 """ % (profile_installed_path, profile_installed_path, config_profile)
     if opts.delete_after_install:
