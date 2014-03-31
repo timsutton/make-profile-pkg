@@ -157,7 +157,7 @@ fi
 
     # Munki-related
     # -- uninstaller script
-    uninstall_script_path = tempfile.mkstemp()[1]
+    uninstall_script_path = os.path.join(output_dir, "%s_uninstall.sh" % item_name)
     uninstall_script = """#!/bin/sh
 
 /usr/bin/profiles -R -p %s
