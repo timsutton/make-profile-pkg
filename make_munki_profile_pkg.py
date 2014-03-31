@@ -131,13 +131,6 @@ fi
         fd.write(install_script)
     os.chmod(script_path, 0755)
 
-    # -- PackageInfo template
-    info_template_path = tempfile.mkstemp()[1]
-    info = "<pkg-info "
-    info += "></pkg-info>"
-    with open(info_template_path, "w") as fd:
-        fd.write(info)
-
     # -- build it
     subprocess.call([
         pkgbuild,
@@ -145,7 +138,6 @@ fi
         "--identifier", pkg_identifier,
         "--version", version,
         "--scripts", script_root,
-        "--info", info_template_path,
         pkg_output_path])
 
     # Munki-related
