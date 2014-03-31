@@ -24,9 +24,14 @@ default_repo_destination = "profiles"
 def main():
     usage = "%prog [options] path/to/mobileconfig/file"
     o = optparse.OptionParser(usage=usage)
-    o.add_option("-m", "--munki-import", action="store_true",
+    m_opts = optparse.OptionGroup(o, "Munki options")
+    m_opts.add_option("-m", "--munki-import", action="store_true",
         default=False,
         help=("Import resulting package into Munki. "))
+    m_opts.add_option("-d", "--munki-repo-destination", default=default_repo_destination,
+        help=("Destination directory in Munki repo. Defaults to '%s'. "
+              % default_repo_destination))
+    o.add_option_group(m_opts)
     o.add_option("-f", "--format-name", default=default_name_format_string,
         metavar="FORMAT-STRING",
         help=("A format string specifying the desired pkginfo item name, which "
@@ -47,9 +52,6 @@ def main():
         default=False,
         help=("Configure postinstall script to remove mobileconfig file "
               "after installation."))
-    o.add_option("-d", "--munki-repo-destination", default=default_repo_destination,
-        help=("Destination directory in Munki repo. Defaults to '%s'. "
-              % default_repo_destination))
 
     opts, args = o.parse_args()
 
