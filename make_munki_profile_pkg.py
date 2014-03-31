@@ -56,7 +56,7 @@ def main():
               "derived from today's date."))
     o.add_option("--delete-after-install", action="store_true",
         default=False,
-        help=("Configure postinstall script to remove mobileconfig file "
+        help=("Configure pkg postinstall script to remove mobileconfig file "
               "after installation."))
 
     opts, args = o.parse_args()
@@ -86,7 +86,7 @@ def main():
         sys.exit("Output directory '%s' either doesn't exist or is not writable!"
             % output_dir)
 
-    # Grab the profile's identifier for use later in the pkginfo's uninstall_script
+    # Grab the profile's identifier for use later in the uninstall_script
     try:
         pdata = plistlib.readPlist(profile_path)
         profile_identifier = pdata["PayloadIdentifier"]
@@ -104,7 +104,7 @@ def main():
         now = localtime()
         version = "%04d.%02d.%02d" % (now.tm_year, now.tm_mon, now.tm_mday)
 
-    # Naming of pkginfo item
+    # Naming of item
     profile_name = os.path.basename(profile_path).split(".mobileconfig")[0]
     replaced_template = Template(re.sub("%(?P<token>.+?)%", "${\g<token>}", opts.format_name))
     templatables = {
@@ -156,7 +156,6 @@ fi
         "--scripts", script_root,
         pkg_output_path])
 
-    # Munki-related
     # -- uninstaller script
     uninstall_script_path = os.path.join(output_dir, "%s_uninstall.sh" % item_name)
     uninstall_script = """#!/bin/sh
@@ -168,7 +167,7 @@ fi
     with open(uninstall_script_path, "w") as fd:
         fd.write(uninstall_script)
 
-    # -- import it
+    # -- munkiimport it?
     if opts.munki_import:
         subprocess.call([
             munkiimport,
