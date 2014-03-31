@@ -65,9 +65,12 @@ def main():
     profile_path = args[0]
     pkgbuild = "/usr/bin/pkgbuild"
     munkiimport = "/usr/local/munki/munkiimport"
-    for executable in [pkgbuild, munkiimport]:
+    req_executables = [pkgbuild]
+    if opts.munki_import:
+        req_executables.append(munkiimport)
+    for executable in req_executables:
         if not os.path.isfile(executable) or not os.access(executable, os.X_OK):
-            sys.exit("A required exeuctable, %s could not be found "
+            sys.exit("A required exeuctable, '%s', could not be found "
                      "or is not executable!" % executable)
 
     # Grab the profile's identifier for use later in the pkginfo's uninstall_script
