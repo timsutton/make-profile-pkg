@@ -7,6 +7,7 @@
 import optparse
 import os
 import plistlib
+import re
 import shutil
 import subprocess
 import sys
@@ -16,7 +17,7 @@ from string import Template
 from time import localtime
 from xml.parsers.expat import ExpatError
 
-default_name_format_string = "%%filename"
+default_name_format_string = "%filename%"
 default_installed_path = "/usr/local/share"
 default_pkg_prefix = "com.github.makemunkiprofilepkg"
 default_repo_destination = "profiles"
@@ -39,11 +40,11 @@ def main():
               "working directory."))
     o.add_option("-f", "--format-name", default=default_name_format_string,
         metavar="FORMAT-STRING",
-        help=("A format string specifying the desired pkginfo item name, which "
+        help=("A format string specifying the desired file/pkginfo name, which "
               "may contain tokens that are substituted. Current tokens "
-              "supported are '%%%%filename' (name component of file's basename), "
-              "and '%%%%id' (profile's PayloadIdentifier key). "
-              "Defaults to '%s'." % default_name_format_string))
+              "supported are '%filename%' (name component of file's basename), "
+              "and '%id%' (profile's PayloadIdentifier key). "
+              "Defaults to '%filename%'."))
     o.add_option("-p", "--installed-path", default=default_installed_path,
         help=("Installed path for the profile. Defaults to '%s'. "
             % default_installed_path))
@@ -105,12 +106,12 @@ def main():
 
     # Naming of pkginfo item
     profile_name = os.path.basename(profile_path).split(".mobileconfig")[0]
-    name_template = Template(opts.format_name.replace("%%", "$"))
+    replaced_template = Template(re.sub("%(?P<token>.+?)%", "${\g<token>}", opts.format_name))
     templatables = {
         "filename": profile_name,
         "id": profile_identifier
     }
-    item_name = name_template.safe_substitute(templatables)
+    item_name = replaced_template.safe_substitute(templatables)
 
     # Installer package-related
     pkg_filename = "%s-%s.pkg" % (item_name, version)
