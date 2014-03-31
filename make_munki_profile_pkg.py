@@ -24,10 +24,9 @@ default_repo_destination = "profiles"
 def main():
     usage = "%prog [options] path/to/mobileconfig/file"
     o = optparse.OptionParser(usage=usage)
-    o.add_option("--use-munki", default="munki",
-        help=("Either 'munki' or 'standalone'. If set to 'standalone', "
-              "package will be saved in the same directory as the script "
-              "and no attempt will be made to import it into Munki. "))
+    o.add_option("-m", "--munki-import", action="store_true",
+        default=False,
+        help=("Import resulting package into Munki. "))
     o.add_option("-f", "--format-name", default=default_name_format_string,
         metavar="FORMAT-STRING",
         help=("A format string specifying the desired pkginfo item name, which "
@@ -71,16 +70,6 @@ def main():
             sys.exit("A required exeuctable, %s could not be found "
                      "or is not executable!" % executable)
 
-    # if opts.install_time not in ["immediate", "nextboot"]:
-#         sys.exit("--install-time must be either 'immediate' or 'nextboot'!")
-
-
-    # if opts.install_time == "nextboot" and \
-    #     opts.installed_path != default_installed_path:
-    #     print >> sys.stderr, (
-    #         "WARNING: --installed-path option ignored when --install-time "
-    #         "is nextboot!")
-
     # Grab the profile's identifier for use later in the pkginfo's uninstall_script
     try:
         pdata = plistlib.readPlist(profile_path)
@@ -111,15 +100,9 @@ def main():
     # Installer package-related
     pkg_filename = "%s-%s.pkg" % (item_name, version)
     pkg_identifier = "%s.%s" % (opts.pkg_prefix, item_name)
-    if opts.use_munki == "standalone":
-        pkg_output_path = os.path.join(os.path.dirname(os.path.realpath(__file__)), pkg_filename)
-    else:
-        pkg_output_path = os.path.join(tempfile.mkdtemp(), pkg_filename)
     
-
-    # -- payload
-    # if opts.install_time == "nextboot":
-    #     opts.installed_path = "/private/var/db/ConfigurationProfiles/Setup"
+    pkg_output_path = os.path.join(os.getcwd(), pkg_filename)
+    
     root = tempfile.mkdtemp()
     pkg_payload_destination = os.path.join(root, opts.installed_path.lstrip("/"))
     profile_installed_path = os.path.join(
@@ -132,7 +115,6 @@ def main():
     script_path = os.path.join(script_root, "postinstall")
 
     config_profile = profile_name + '.mobileconfig'
-    print config_profile
     install_script = """#!/bin/sh
 if [ "$3" == "/" ] ; then
     /usr/bin/profiles -I -F %s
@@ -151,8 +133,6 @@ fi
     # -- PackageInfo template
     info_template_path = tempfile.mkstemp()[1]
     info = "<pkg-info "
-    # if opts.install_time == "nextboot":
-#         info += "postinstall-action=\"restart\""
     info += "></pkg-info>"
     with open(info_template_path, "w") as fd:
         fd.write(info)
@@ -180,7 +160,7 @@ fi
         fd.write(uninstall_script)
 
     # -- import it
-    if opts.use_munki == "munki":
+    if opts.munki_import:
         subprocess.call([
             munkiimport,
             "--nointeractive",
