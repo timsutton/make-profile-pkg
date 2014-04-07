@@ -1,4 +1,4 @@
-## make_munki_profile_pkg
+## Make Profile Pkg
 
 Given a Configuration Profile as an argument, this script:
 - builds a flat package that installs it to a configurable path
