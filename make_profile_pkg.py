@@ -51,7 +51,7 @@ def main():
     o.add_option("--pkg-prefix", default=default_pkg_prefix,
         help=("Installer pkg identifier prefix. Defaults to '%s'. "
               % default_pkg_prefix))
-    o.add_option("--version",
+    o.add_option("-v", "--version",
         help=("Version of the built pkg. Defaults to 'YYYY.MM.DD' "
               "derived from today's date."))
     o.add_option("--delete-after-install", action="store_true",
