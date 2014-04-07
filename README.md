@@ -9,8 +9,6 @@ Given a Configuration Profile as an argument, this script:
 
 Run with `-h` to see the full help.
 
-There are some additional options to tweak the pkg/Munki item name and package identifier, but currently no other options to configure Munki pkginfo keys you may wish to configure afterwards (minimum_os_version, requires, update_for, etc.).
-
 If the package isn't installed to the boot volume (when using [AutoDMG](https://github.com/MagerValp/AutoDMG), for example), the profile will be also copied to `/private/var/db/ConfigurationProfiles/Setup` so it will be instead be installed when the volume is next booted.
 
 
