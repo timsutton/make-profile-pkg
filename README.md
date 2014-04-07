@@ -1,37 +1,39 @@
 ## Make Profile Pkg
 
 Given a Configuration Profile as an argument, this script:
-- builds a flat package that installs it to a configurable path
-- creates a postinstall script to install the profile
+- builds a flat package that installs the profile to a configurable path
+- creates a postinstall script to install the profile:
   - (optionally removing the .mobileconfig file after installation)
-- creates an uninstall script for Munki to allow the profile to be
-  later removed
-- optionally calls munkiimport to create a new pkginfo and import the pkg into
-  the repo (when passing the ``-m`` option)
+- saves an uninstall script for the profile alongside the package
+- optionally imports the pkg into a Munki repo (see the `-m` option)
 
 Run with `-h` to see the full help.
 
-There are some additional options to tweak the pkg/Munki item name and package identifier, but currently no other options to configure the pkginfo keys you may wish to configure afterwards (minimum_os_version, requires, update_for, etc.).
+There are some additional options to tweak the pkg/Munki item name and package identifier, but currently no other options to configure Munki pkginfo keys you may wish to configure afterwards (minimum_os_version, requires, update_for, etc.).
 
-If the package isn't installed to the boot volume (when using AutoDMG, for example), the profile will be copied to`` /private/var/db/ConfigurationProfiles/Setup`` so it will be installed at the next reboot.
+If the package isn't installed to the boot volume (when using [AutoDMG](https://github.com/MagerValp/AutoDMG), for example), the profile will be also copied to `/private/var/db/ConfigurationProfiles/Setup` so it will be instead be installed when the volume is next booted.
 
 
 ### Rationale
 
 OS X has a mechanism (the `profiles` utility) to install profiles given a Configuration Profile on disk. It can also remove a profile given either the path to the file, or the profile's identifier.
 
-Coupled with the fact that we can package these data and instructions and version the package, we have at least a basic mechanism to consider that a profile has been installed.
+Coupled with the fact that we can package these data and instructions and version the package, we can use built-in mechanisms to install the profile and/or check whether this profile has been installed.
 
-The installation of the profile is done as a postinstall script within the package rather than a Munki `postinstall_script` so that the package is not limited to use with Munki. The removal of the package does make use of Munki's `uninstall_script` removal method, however.
+
+### Munki-specific use
+
+The packages are built to be just as useful without Munki, but if you do import them into Munki, the `uninstall_method` and `uninstall_script` keys will be set appropriately.
 
 If you would rather have a mechanism that can "enforce" that a profile is installed, and with exactly the contents you would expect, this is not it. This relies solely on the installer package receipt to consider the profile as being installed.
+
 
 ### Examples
 
 No options are required:
 
 ```bash
-➜ ./make_munki_profile_pkg.py suppress_ml_icloud_asst.mobileconfig
+➜ ./make_profile_pkg.py suppress_ml_icloud_asst.mobileconfig
 
 pkgbuild: Inferring bundle components from contents of /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmpsgtSN2
 pkgbuild: Adding top-level postinstall script
@@ -43,8 +45,8 @@ Saving pkginfo to /Volumes/munki_repo/pkgsinfo/profiles/suppress_ml_icloud_asst-
 But, there are several you can set:
 
 ```bash
-➜ ./make_munki_profile_pkg.py \
-    --format-name "Profile_%%filename" \
+➜ ./make_profile_pkg.py \
+    --format-name "Profile_%filename%" \
     --installed-path /Library/MyGreatOrg/Profiles \
     --version 10.8 \
     --pkg-prefix org.my.great \
@@ -59,12 +61,18 @@ Copying Profile_suppress_ml_icloud_asst-10.8.pkg to /Volumes/munki_repo/pkgs/def
 Saving pkginfo to /Volumes/munki_repo/pkgsinfo/defaults/profiles/Profile_suppress_ml_icloud_asst-10.8.plist...
 ```
 
-In the latter case, the package's postinstall script:
+In the latter case, here's what the package's postinstall script looks like:
 
 ```bash
 #!/bin/sh
-
-/usr/bin/profiles -I -F /Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig
+if [ "$3" = "/" ] ; then
+    /usr/bin/profiles -I -F /Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig
+else
+    PROFILES_SETUP=private/var/db/ConfigurationProfiles/Setup
+    /bin/mkdir -p "$3/$PROFILES_SETUP"
+    /bin/cp "$3/Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig" "$3/$PROFILES_SETUP/suppress_ml_icloud_asst.mobileconfig"
+    /bin/rm -f "$3/$PROFILES_SETUP/.profileSetupDone"
+fi
 
 /bin/rm -f /Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig
 ```
