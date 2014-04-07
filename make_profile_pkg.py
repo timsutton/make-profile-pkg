@@ -1,6 +1,6 @@
 #!/usr/bin/python
 #
-# make_munki_profile_pkg.py
+# make_profile_pkg.py
 #
 # Tim Sutton, 2014
 
@@ -19,7 +19,7 @@ from xml.parsers.expat import ExpatError
 
 default_name_format_string = "%filename%"
 default_installed_path = "/usr/local/share"
-default_pkg_prefix = "com.github.makemunkiprofilepkg"
+default_pkg_prefix = "com.github.makeprofilepkg"
 default_repo_destination = "profiles"
 
 def main():
