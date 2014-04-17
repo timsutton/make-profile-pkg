@@ -33,11 +33,9 @@ No options are required:
 ```bash
 ➜ ./make_profile_pkg.py suppress_ml_icloud_asst.mobileconfig
 
-pkgbuild: Inferring bundle components from contents of /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmpsgtSN2
+pkgbuild: Inferring bundle components from contents of /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmpaiPyN5
 pkgbuild: Adding top-level postinstall script
-pkgbuild: Wrote package to /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmpVNbN1Z/suppress_ml_icloud_asst-2014.03.21.pkg
-Copying suppress_ml_icloud_asst-2014.03.21.pkg to /Volumes/munki_repo/pkgs/profiles/suppress_ml_icloud_asst-2014.03.21.pkg...
-Saving pkginfo to /Volumes/munki_repo/pkgsinfo/profiles/suppress_ml_icloud_asst-2014.03.21.plist...
+pkgbuild: Wrote package to /Users/tsutton/git/github/make-profile-pkg/suppress_ml_icloud_asst-2014.04.17.pkg
 ```
 
 But, there are several you can set:
@@ -50,11 +48,12 @@ But, there are several you can set:
     --pkg-prefix org.my.great \
     --delete-after-install \
     --munki-repo-destination "defaults/profiles" \
+    --munki-import \
     suppress_ml_icloud_asst.mobileconfig
 
-pkgbuild: Inferring bundle components from contents of /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmpdhHNxn
+pkgbuild: Inferring bundle components from contents of /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmp_LwP92
 pkgbuild: Adding top-level postinstall script
-pkgbuild: Wrote package to /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmpw2N1dL/Profile_suppress_ml_icloud_asst-10.8.pkg
+pkgbuild: Wrote package to /Users/tsutton/git/github/make-profile-pkg/Profile_suppress_ml_icloud_asst-10.8.pkg
 Copying Profile_suppress_ml_icloud_asst-10.8.pkg to /Volumes/munki_repo/pkgs/defaults/profiles/Profile_suppress_ml_icloud_asst-10.8.pkg...
 Saving pkginfo to /Volumes/munki_repo/pkgsinfo/defaults/profiles/Profile_suppress_ml_icloud_asst-10.8.plist...
 ```
