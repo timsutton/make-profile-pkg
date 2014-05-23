@@ -174,6 +174,7 @@ fi
             "--nointeractive",
             "--subdirectory", opts.munki_repo_destination,
             "--uninstall-script", uninstall_script_path,
+            "--minimum-os-version", "10.7",
             pkg_output_path
             ]
         )
