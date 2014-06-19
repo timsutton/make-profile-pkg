@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 
+from pipes import quote
 from string import Template
 from time import localtime
 from xml.parsers.expat import ExpatError
@@ -140,7 +141,7 @@ else
     /bin/cp "$3%s" "$3/$PROFILES_SETUP/%s"
     /bin/rm -f "$3/$PROFILES_SETUP/.profileSetupDone"
 fi
-""" % (profile_installed_path, profile_installed_path, config_profile)
+""" % (quote(profile_installed_path), profile_installed_path, config_profile)
     if opts.delete_after_install:
         install_script += "\n/bin/rm -f %s" % profile_installed_path
     with open(script_path, "w") as fd:
@@ -163,7 +164,7 @@ fi
 /usr/bin/profiles -R -p %s
 /bin/rm -f %s
 /usr/sbin/pkgutil --forget %s
-""" % (profile_identifier, profile_installed_path, pkg_identifier)
+""" % (quote(profile_identifier), quote(profile_installed_path), quote(pkg_identifier))
     with open(uninstall_script_path, "w") as fd:
         fd.write(uninstall_script)
 
