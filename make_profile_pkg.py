@@ -136,14 +136,18 @@ def main():
 if [ "$3" = "/" ] ; then
     /usr/bin/profiles -I -F %s
 else
-    PROFILES_SETUP=private/var/db/ConfigurationProfiles/Setup
-    /bin/mkdir -p "$3/$PROFILES_SETUP"
-    /bin/cp "$3%s" "$3/$PROFILES_SETUP/%s"
-    /bin/rm -f "$3/$PROFILES_SETUP/.profileSetupDone"
+    /bin/mkdir -p "$3/private/var/db/ConfigurationProfiles/Setup"
+    /bin/cp %s %s
+    /bin/rm -f "$3/private/var/db/ConfigurationProfiles/Setup/.profileSetupDone"
 fi
-""" % (quote(profile_installed_path), profile_installed_path, config_profile)
+""" % (
+    quote(profile_installed_path),
+    quote("$3" + profile_installed_path),
+    quote('$3/private/var/db/ConfigurationProfiles/Setup/' + config_profile)
+    )
+
     if opts.delete_after_install:
-        install_script += "\n/bin/rm -f %s" % profile_installed_path
+        install_script += """\n/bin/rm -f %s""" % quote(profile_installed_path)
     with open(script_path, "w") as fd:
         fd.write(install_script)
     os.chmod(script_path, 0755)
