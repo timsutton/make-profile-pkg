@@ -1,2 +1,5 @@
 *.py[cod]
 .DS_Store
+*.pkg
+*.mobileconfig
+*.sh
