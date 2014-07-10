@@ -18,6 +18,8 @@ OS X has a mechanism (the `profiles` utility) to install profiles given a Config
 
 Coupled with the fact that we can package these data and instructions and version the package, we can use built-in mechanisms to install the profile and/or check whether this profile has been installed.
 
+Read even more back-story [here](http://macops.ca/how-to-package-profiles).
+
 
 ### Munki-specific use
 
