@@ -67,10 +67,9 @@ In the latter case, here's what the package's postinstall script looks like:
 if [ "$3" = "/" ] ; then
     /usr/bin/profiles -I -F /Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig
 else
-    PROFILES_SETUP=private/var/db/ConfigurationProfiles/Setup
-    /bin/mkdir -p "$3/$PROFILES_SETUP"
-    /bin/cp "$3/Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig" "$3/$PROFILES_SETUP/suppress_ml_icloud_asst.mobileconfig"
-    /bin/rm -f "$3/$PROFILES_SETUP/.profileSetupDone"
+    /bin/mkdir -p "$3/private/var/db/ConfigurationProfiles/Setup"
+    /bin/cp "$3"/Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig "$3"/private/var/db/ConfigurationProfiles/Setup/suppress_ml_icloud_asst.mobileconfig
+    /bin/rm -f "$3/private/var/db/ConfigurationProfiles/Setup/.profileSetupDone"
 fi
 
 /bin/rm -f /Library/MyGreatOrg/Profiles/suppress_ml_icloud_asst.mobileconfig
