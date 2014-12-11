@@ -142,8 +142,8 @@ else
 fi
 """ % (
     quote(profile_installed_path),
-    quote("$3" + profile_installed_path),
-    quote('$3/private/var/db/ConfigurationProfiles/Setup/' + config_profile)
+    "\"$3\"" + quote(profile_installed_path),
+    "\"$3\"" + quote('/private/var/db/ConfigurationProfiles/Setup/' + config_profile)
     )
 
     if opts.delete_after_install:
