@@ -23,9 +23,13 @@ Read even more backstory [here](http://macops.ca/how-to-package-profiles).
 
 ### Munki-specific use
 
-The packages are built to be just as useful without Munki, but if you do import them into Munki, the `uninstall_method` and `uninstall_script` keys will be set appropriately.
+The packages are built to be just as useful without Munki, but if you do import them into Munki, the following additional keys will be set appropriately:
+- `description`, `display_name` (taken from the profile's `PayloadDisplayName` and `PayloadDescription` keys)
+- `installcheck_script` (see below)
+- `minimum_os_version` (Profiles require Lion or newer)
+- `uninstall_method` and `uninstall_script`
 
-If you would rather have a mechanism that can "enforce" that a profile is installed, and with exactly the contents you would expect, this is not it. This relies solely on the installer package receipt to consider the profile as being installed.
+Additionally, the Munki pkginfo will use the `installcheck_script` mechanism to check whether the profile is actually installed on the machine, rather than only checking for an installer package receipt. This allows Munki to ensure that the profile is installed even if a user should later remove it after the initial installation. The script is borrowed from [Graham Gilbert's sample script](https://github.com/grahamgilbert/mactech_2014/blob/effbfbfad4f1dfa9328287127c40a9051dcd4cb2/Profile/installcheck_script_v2.sh) from a session at MacTech 2014.
 
 
 ### Examples
@@ -79,10 +83,6 @@ fi
 ... and the generated pkginfo:
 
 ```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
     <key>autoremove</key>
     <false/>
     <key>catalogs</key>
@@ -90,19 +90,47 @@ fi
         <string>testing</string>
     </array>
     <key>description</key>
-    <string></string>
+    <string>Custom: com.apple.SetupAssistant</string>
     <key>display_name</key>
-    <string>Profile_suppress_ml_icloud_asst-10.8</string>
+    <string>MCXToProfile: com.apple.SetupAssistant</string>
+    <key>installcheck_script</key>
+    <string>#!/bin/bash
+
+# The version of the package
+PKG_VERSION="10.8"
+
+# The identifier of the package
+PKG_ID="org.my.great.Profile_suppress_ml_icloud_asst"
+
+# The identifier of the profile
+PROFILE_ID="suppress_ml_icloud_asst"
+
+# The version installed from pkgutil
+VERSION_INSTALLED=`/usr/sbin/pkgutil --pkg-info "$PKG_ID" | grep version | sed 's/^[^:]*: //'`
+
+if ( /usr/bin/profiles -P | /usr/bin/grep -q $PROFILE_ID ); then
+    # Profile is present, check the version
+    if [ "$VERSION_INSTALLED" = "$PKG_VERSION" ]; then
+        # Correct version, all good
+        exit 1
+    else
+        exit 0
+    fi
+else
+    # Profile isn't there, need to install
+    exit 0
+fi
+</string>
     <key>installed_size</key>
     <integer>4</integer>
     <key>installer_item_hash</key>
-    <string>fb975facf67986ad3f71f3face884cc46301606f22ccfb6b50834509ba507215</string>
+    <string>b968f5dd9fed506e6592cb26887034c1346339a4dc3e4312e292f40f094e9cb7</string>
     <key>installer_item_location</key>
     <string>defaults/profiles/Profile_suppress_ml_icloud_asst-10.8.pkg</string>
     <key>installer_item_size</key>
-    <integer>2</integer>
+    <integer>4</integer>
     <key>minimum_os_version</key>
-    <string>10.5.0</string>
+    <string>10.7</string>
     <key>name</key>
     <string>Profile_suppress_ml_icloud_asst</string>
     <key>receipts</key>
