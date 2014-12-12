@@ -99,6 +99,10 @@ def main():
             "profiles are supported.")
         sys.exit("Error: %s" % e.message)
 
+    # Grab other profile metadata for use in Munki's pkginfo
+    profile_display_name = pdata.get("PayloadDisplayName")
+    profile_description = pdata.get("PayloadDescription", '')
+
     # Version
     version = opts.version
     if not version:
@@ -209,6 +213,8 @@ fi
         subprocess.call([
             munkiimport,
             "--nointeractive",
+            "--displayname", profile_display_name or item_name,
+            "--description", profile_description, 
             "--subdirectory", opts.munki_repo_destination,
             "--uninstall-script", uninstall_script_path,
             "--installcheck-script", installcheck_script_path,
