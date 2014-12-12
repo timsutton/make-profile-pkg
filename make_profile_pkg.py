@@ -172,6 +172,38 @@ fi
     with open(uninstall_script_path, "w") as fd:
         fd.write(uninstall_script)
 
+    # -- installcheck_script
+    installcheck_script_path = os.path.join(output_dir, "%s_installcheck.sh" % item_name)
+    installcheck_script = """#!/bin/bash
+
+# The version of the package
+PKG_VERSION="%s"
+
+# The identifier of the package
+PKG_ID="%s"
+
+# The identifier of the profile
+PROFILE_ID="%s"
+
+# The version installed from pkgutil
+VERSION_INSTALLED=`/usr/sbin/pkgutil --pkg-info "$PKG_ID" | grep version | sed 's/^[^:]*: //'`
+
+if ( /usr/bin/profiles -P | /usr/bin/grep -q $PROFILE_ID ); then
+    # Profile is present, check the version
+    if [ "$VERSION_INSTALLED" = "$PKG_VERSION" ]; then
+        # Correct version, all good
+        exit 1
+    else
+        exit 0
+    fi
+else
+    # Profile isn't there, need to install
+    exit 0
+fi
+""" % (version, pkg_identifier, profile_identifier)
+    with open(installcheck_script_path, "w") as fd:
+        fd.write(installcheck_script)
+
     # -- munkiimport it?
     if opts.munki_import:
         subprocess.call([
@@ -179,6 +211,7 @@ fi
             "--nointeractive",
             "--subdirectory", opts.munki_repo_destination,
             "--uninstall-script", uninstall_script_path,
+            "--installcheck-script", installcheck_script_path,
             "--minimum-os-version", "10.7",
             pkg_output_path
             ]
