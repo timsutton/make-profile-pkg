@@ -6,6 +6,7 @@ Given a Configuration Profile as an argument, this script:
   - (optionally removing the .mobileconfig file after installation)
 - saves an uninstall script for the profile alongside the package
 - optionally imports the pkg into a Munki repo (see the `-m` option)
+  - *note*: see the 'Munki-specific use' section below regarding Munki's native support for handling configuration profiles
 
 Run with `-h` to see the full help.
 
@@ -22,6 +23,8 @@ Read even more backstory [here](http://macops.ca/how-to-package-profiles).
 
 
 ### Munki-specific use
+
+*Note*: As of Munki 2.2 (not yet released, but [available as a release candidate](https://github.com/munki/munki/releases/tag/v2.2.0.2365), Munki can natively import configuration profiles. I would recommend that if you are only planning to deploy a profile using Munki to use its native support rather than this tool. This tool is still useful for building installer packages for use in differentscenarios. See Armin Briegel's [blog post](http://scriptingosx.com/2015/01/push-settings-with-munkis-new-profile-support) for a good example of how this works (specifically towards the bottom, "Importing the Profile into Munki."
 
 The packages are built to be just as useful without Munki, but if you do import them into Munki, the following additional keys will be set appropriately:
 - `description`, `display_name` (taken from the profile's `PayloadDisplayName` and `PayloadDescription` keys)
