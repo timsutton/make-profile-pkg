@@ -74,6 +74,8 @@ def main():
     profile_path = args[0]
     pkgbuild = "/usr/bin/pkgbuild"
     munkiimport = "/usr/local/munki/munkiimport"
+    openssl = "/usr/bin/openssl"
+    tmp_profile = "/tmp/profile.mobileconfig"
     req_executables = [pkgbuild]
     if opts.munki_import:
         req_executables.append(munkiimport)
@@ -95,9 +97,31 @@ def main():
         sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
     except ExpatError as e:
         print >> sys.stderr, (
-            "Profile is either malformed or signed. Currently only unsigned "
-            "profiles are supported.")
-        sys.exit("Error: %s" % e.message)
+            "Profile is either malformed or signed. Attempting to "
+            "unsign the profile. Message: %s" % e.message)
+        try:
+            # Unsign the profile into /tmp/
+            subprocess.check_call([
+                openssl,
+                "smime",
+                "-inform", "DER",
+                "-verify",
+                "-in", profile_path,
+                "-noverify",
+                "-out", tmp_profile])
+            try:
+                pdata = plistlib.readPlist(tmp_profile)
+                profile_identifier = pdata["PayloadIdentifier"]
+            except KeyError:
+            	sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
+            except ExpatError as e:
+				print >> sys.stderr, (
+					"Profile is malformed.")
+				sys.exit("Error: %s" % e.message)
+        except subprocess.CalledProcessError as e:
+            print >> sys.stderr, (
+                "Profile could not be unsigned.")
+            sys.exit("Error %s: %s" % (e.returncode, e.message))
 
     # Grab other profile metadata for use in Munki's pkginfo
     profile_display_name = pdata.get("PayloadDisplayName")
