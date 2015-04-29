@@ -198,4 +198,4 @@ Copying Profile_suppress_ml_icloud_asst-10.8.pkg to /Volumes/munki_repo/pkgs/def
 Saving pkginfo to /Volumes/munki_repo/pkgsinfo/defaults/profiles/Profile_suppress_ml_icloud_asst-10.8.plist...
 ```
 
-You will be prompted to approve the use of your identity by `pkgbuild` and `security`.  These settings can be changed in Keychain Access by selecting your private key associated with the certificate and choosing File -> Get Info -> Access Control.
+You may be prompted to approve the use of your identity by `pkgbuild` and `security`.  These settings can be changed in Keychain Access by selecting your private key associated with the certificate and choosing File -> Get Info -> Access Control.
