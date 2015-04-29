@@ -91,33 +91,29 @@ def main():
     # Grab the profile's identifier for use later in the uninstall_script
     try:
         pdata = plistlib.readPlist(profile_path)
-        profile_identifier = pdata["PayloadIdentifier"]
-    except KeyError:
-        sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
     except ExpatError as e:
         print >> sys.stderr, (
             "Profile is either malformed or signed. Attempting to "
             "unsign the profile. Message: %s" % e.message)
         try:
-            # Unsign the profile into /tmp/
             profile_data = subprocess.check_output([
                 security,
                 "cms",
                 "-D",
                 "-i", profile_path])
-            try:
-                pdata = plistlib.readPlistFromString(profile_data)
-                profile_identifier = pdata["PayloadIdentifier"]
-            except KeyError:
-                sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
-            except ExpatError as e:
-                print >> sys.stderr, (
-                    "Profile is malformed.")
-                sys.exit("Error: %s" % e.message)
+            pdata = plistlib.readPlistFromString(profile_data)
         except subprocess.CalledProcessError as e:
             print >> sys.stderr, (
                 "Profile could not be unsigned.")
             sys.exit("Error %s: %s" % (e.returncode, e.message))
+    try:
+        profile_identifier = pdata["PayloadIdentifier"]
+    except KeyError:
+        sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
+    except ExpatError as e:
+        print >> sys.stderr, (
+            "Profile is malformed.")
+        sys.exit("Error: %s" % e.message)
 
     # Grab other profile metadata for use in Munki's pkginfo
     profile_display_name = pdata.get("PayloadDisplayName")
