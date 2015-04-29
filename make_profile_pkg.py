@@ -109,11 +109,11 @@ def main():
                 pdata = plistlib.readPlistFromString(profile_data)
                 profile_identifier = pdata["PayloadIdentifier"]
             except KeyError:
-            	sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
+                sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
             except ExpatError as e:
-				print >> sys.stderr, (
-					"Profile is malformed.")
-				sys.exit("Error: %s" % e.message)
+                print >> sys.stderr, (
+                    "Profile is malformed.")
+                sys.exit("Error: %s" % e.message)
         except subprocess.CalledProcessError as e:
             print >> sys.stderr, (
                 "Profile could not be unsigned.")
