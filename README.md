@@ -177,7 +177,7 @@ Note that if you use Apple developer certificates, you must use an Installer typ
 
 Use the common name of a valid identity to pass to the `--sign` argument:  
 ```bash
-➜ ./make_profile_pkg.py \
+ ./make_profile_pkg.py \
     --format-name "Profile_%filename%" \
     --installed-path /Library/MyGreatOrg/Profiles \
     --version 10.8 \
