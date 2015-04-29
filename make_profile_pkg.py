@@ -174,25 +174,19 @@ fi
         fd.write(install_script)
     os.chmod(script_path, 0755)
 
-    if opts.sign:
-        # -- build it
-        subprocess.call([
-            pkgbuild,
-            "--root", root,
-            "--identifier", pkg_identifier,
-            "--version", version,
-            "--scripts", script_root,
-            "--sign", opts.sign,
-            pkg_output_path])
-    else:
-        # -- build it
-        subprocess.call([
-            pkgbuild,
-            "--root", root,
-            "--identifier", pkg_identifier,
-            "--version", version,
-            "--scripts", script_root,
-            pkg_output_path])
+	# thanks, frogor
+	cmd = [pkgbuild,
+		   "--root", root,
+		   "--identifier", pkg_identifier,
+		   "--version", version,
+		   "--scripts", script_root,
+		   pkg_output_path]
+ 
+	if opts.sign:
+		# Use slice assignment to insert an additional option before the final argument
+		cmd[-1:] = ["--sign", opts.sign, pkg_output_path]
+ 
+	subprocess.call(cmd)
 
     # -- uninstaller script
     uninstall_script_path = os.path.join(output_dir, "%s_uninstall.sh" % item_name)
