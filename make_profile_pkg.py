@@ -74,8 +74,7 @@ def main():
     profile_path = args[0]
     pkgbuild = "/usr/bin/pkgbuild"
     munkiimport = "/usr/local/munki/munkiimport"
-    openssl = "/usr/bin/openssl"
-    tmp_profile = "/tmp/profile.mobileconfig"
+    security = "/usr/bin/security"
     req_executables = [pkgbuild]
     if opts.munki_import:
         req_executables.append(munkiimport)
@@ -101,16 +100,13 @@ def main():
             "unsign the profile. Message: %s" % e.message)
         try:
             # Unsign the profile into /tmp/
-            subprocess.check_call([
-                openssl,
-                "smime",
-                "-inform", "DER",
-                "-verify",
-                "-in", profile_path,
-                "-noverify",
-                "-out", tmp_profile])
+            profile_data = subprocess.check_output([
+                security,
+                "cms",
+                "-D",
+                "-i", profile_path])
             try:
-                pdata = plistlib.readPlist(tmp_profile)
+                pdata = plistlib.readPlistFromString(profile_data)
                 profile_identifier = pdata["PayloadIdentifier"]
             except KeyError:
             	sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
