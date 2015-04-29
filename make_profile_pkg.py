@@ -74,6 +74,7 @@ def main():
     profile_path = args[0]
     pkgbuild = "/usr/bin/pkgbuild"
     munkiimport = "/usr/local/munki/munkiimport"
+    security = "/usr/bin/security"
     req_executables = [pkgbuild]
     if opts.munki_import:
         req_executables.append(munkiimport)
@@ -90,13 +91,28 @@ def main():
     # Grab the profile's identifier for use later in the uninstall_script
     try:
         pdata = plistlib.readPlist(profile_path)
+    except ExpatError as e:
+        print >> sys.stderr, (
+            "Profile is either malformed or signed. Attempting to "
+            "unsign the profile. Message: %s" % e.message)
+        try:
+            profile_data = subprocess.check_output([
+                security,
+                "cms",
+                "-D",
+                "-i", profile_path])
+            pdata = plistlib.readPlistFromString(profile_data)
+        except subprocess.CalledProcessError as e:
+            print >> sys.stderr, (
+                "Profile could not be unsigned.")
+            sys.exit("Error %s: %s" % (e.returncode, e.message))
+    try:
         profile_identifier = pdata["PayloadIdentifier"]
     except KeyError:
         sys.exit("Expected 'PayloadIdentifier' key in profile, but none found!")
     except ExpatError as e:
         print >> sys.stderr, (
-            "Profile is either malformed or signed. Currently only unsigned "
-            "profiles are supported.")
+            "Profile is malformed.")
         sys.exit("Error: %s" % e.message)
 
     # Grab other profile metadata for use in Munki's pkginfo
