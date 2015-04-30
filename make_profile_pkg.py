@@ -59,6 +59,8 @@ def main():
         default=False,
         help=("Configure pkg postinstall script to remove mobileconfig file "
               "after installation."))
+    o.add_option("--sign",
+        help=("Sign the resulting package with the specified identity."))
 
     opts, args = o.parse_args()
 
@@ -172,14 +174,19 @@ fi
         fd.write(install_script)
     os.chmod(script_path, 0755)
 
-    # -- build it
-    subprocess.call([
-        pkgbuild,
-        "--root", root,
-        "--identifier", pkg_identifier,
-        "--version", version,
-        "--scripts", script_root,
-        pkg_output_path])
+    # thanks, frogor
+    cmd = [pkgbuild,
+           "--root", root,
+           "--identifier", pkg_identifier,
+           "--version", version,
+           "--scripts", script_root,
+           pkg_output_path]
+ 
+    if opts.sign:
+        # Use slice assignment to insert an additional option before the final argument
+        cmd[-1:] = ["--sign", opts.sign, pkg_output_path]
+ 
+    subprocess.call(cmd)
 
     # -- uninstaller script
     uninstall_script_path = os.path.join(output_dir, "%s_uninstall.sh" % item_name)

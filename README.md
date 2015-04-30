@@ -168,3 +168,34 @@ fi
 </plist>
 ```
 
+### Signing Packages
+
+Output packages can be optionally signed using the `--sign` option.  A valid identity must be provided.  To find valid identities that can be used for signing:  
+`/usr/bin/security find-identity -p basic -v`
+
+Note that if you use Apple developer certificates, you must use an Installer type certificate to sign packages using `pkgbuild`.  Note also that if you use a certificate that is untrusted on client machines, your package will not install.
+
+Use the common name of a valid identity to pass to the `--sign` argument:  
+```bash
+ ./make_profile_pkg.py \
+    --format-name "Profile_%filename%" \
+    --installed-path /Library/MyGreatOrg/Profiles \
+    --version 10.8 \
+    --pkg-prefix org.my.great \
+    --delete-after-install \
+    --munki-repo-destination "defaults/profiles" \
+    --munki-import \
+    --sign "3rd Party Mac Developer Installer"
+    suppress_ml_icloud_asst.mobileconfig
+
+pkgbuild: Inferring bundle components from contents of /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmp_LwP92
+pkgbuild: Adding top-level postinstall script
+pkgbuild: Signing package with identity "3rd Party Mac Developer Installer" from keychain /Users/tsutton/Library/Keychains/login.keychain
+pkgbuild: Adding certificate "Apple Worldwide Developer Relations Certification Authority"
+pkgbuild: Adding certificate "Apple Root CA"
+pkgbuild: Wrote package to /Users/tsutton/git/github/make-profile-pkg/Profile_suppress_ml_icloud_asst-10.8.pkg
+Copying Profile_suppress_ml_icloud_asst-10.8.pkg to /Volumes/munki_repo/pkgs/defaults/profiles/Profile_suppress_ml_icloud_asst-10.8.pkg...
+Saving pkginfo to /Volumes/munki_repo/pkgsinfo/defaults/profiles/Profile_suppress_ml_icloud_asst-10.8.plist...
+```
+
+You may be prompted to approve the use of your identity by `pkgbuild` and `security`.  These settings can be changed in Keychain Access by selecting your private key associated with the certificate and choosing File -> Get Info -> Access Control.
