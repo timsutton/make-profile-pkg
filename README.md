@@ -170,12 +170,12 @@ fi
 
 ### Signing Packages
 
-Output packages can be optionally signed using the `--sign` option.  A valid identity must be provided.  To find valid identities that can be used for signing:  
+Output packages can be optionally signed using the `--sign` option.  A valid identity must be provided.  To find valid identities that can be used for signing:
 `/usr/bin/security find-identity -p basic -v`
 
 Note that if you use Apple developer certificates, you must use an Installer type certificate to sign packages using `pkgbuild`.  Note also that if you use a certificate that is untrusted on client machines, your package will not install.
 
-Use the common name of a valid identity to pass to the `--sign` argument:  
+Use the common name of a valid identity to pass to the `--sign` argument:
 ```bash
  ./make_profile_pkg.py \
     --format-name "Profile_%filename%" \
@@ -185,7 +185,7 @@ Use the common name of a valid identity to pass to the `--sign` argument:
     --delete-after-install \
     --munki-repo-destination "defaults/profiles" \
     --munki-import \
-    --sign "3rd Party Mac Developer Installer"
+    --sign "3rd Party Mac Developer Installer" \
     suppress_ml_icloud_asst.mobileconfig
 
 pkgbuild: Inferring bundle components from contents of /var/folders/8t/5trmslfj2cnd5gxkbmkbn5fj38qb2l/T/tmp_LwP92

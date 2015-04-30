@@ -139,9 +139,9 @@ def main():
     # Installer package-related
     pkg_filename = "%s-%s.pkg" % (item_name, version)
     pkg_identifier = "%s.%s" % (opts.pkg_prefix, item_name)
-    
+
     pkg_output_path = os.path.join(output_dir, pkg_filename)
-    
+
     root = tempfile.mkdtemp()
     pkg_payload_destination = os.path.join(root, opts.installed_path.lstrip("/"))
     profile_installed_path = os.path.join(
@@ -181,11 +181,11 @@ fi
            "--version", version,
            "--scripts", script_root,
            pkg_output_path]
- 
+
     if opts.sign:
         # Use slice assignment to insert an additional option before the final argument
         cmd[-1:] = ["--sign", opts.sign, pkg_output_path]
- 
+
     subprocess.call(cmd)
 
     # -- uninstaller script
@@ -237,7 +237,7 @@ fi
             munkiimport,
             "--nointeractive",
             "--displayname", profile_display_name or item_name,
-            "--description", profile_description, 
+            "--description", profile_description,
             "--subdirectory", opts.munki_repo_destination,
             "--uninstall-script", uninstall_script_path,
             "--installcheck-script", installcheck_script_path,
