@@ -52,6 +52,12 @@ def main():
     o.add_option("--pkg-prefix", default=default_pkg_prefix,
         help=("Installer pkg identifier prefix. Defaults to '%s'. "
               % default_pkg_prefix))
+    o.add_option("-U", dest="username", metavar="USERNAME",
+        help=("Includes a '-U <username>' option that will be passed to the "
+              "`profiles` command. Please see the `profiles` manpage for "
+              "more details on the -U option. This is also only supported on "
+              "10.11 and up, and the package may fail if installed on an "
+              "earlier OS version."))
     o.add_option("-v", "--version",
         help=("Version of the built pkg. Defaults to 'YYYY.MM.DD' "
               "derived from today's date."))
@@ -154,9 +160,14 @@ def main():
     script_path = os.path.join(script_root, "postinstall")
 
     config_profile = profile_name + '.mobileconfig'
+
+    additional_opts = ""
+    if opts.username:
+        additional_opts += "-U %s" % opts.username
+
     install_script = """#!/bin/sh
 if [ "$3" = "/" ] ; then
-    /usr/bin/profiles -I -F %s
+    /usr/bin/profiles -I -F %s %s
 else
     /bin/mkdir -p "$3/private/var/db/ConfigurationProfiles/Setup"
     /bin/cp %s %s
@@ -164,6 +175,7 @@ else
 fi
 """ % (
     quote(profile_installed_path),
+    quote(additional_opts),
     "\"$3\"" + quote(profile_installed_path),
     "\"$3\"" + quote('/private/var/db/ConfigurationProfiles/Setup/' + config_profile)
     )
